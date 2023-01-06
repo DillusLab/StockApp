@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">StockApp</string>
+    <!-- TODO: String usable app -->
+    <string name="app_description">Actualización del stock en tiempo real.\nFácil accesibilidad para los usuarios.</string>
+
+    <string name="accederCorreo">Acceder con el correo electrónico</string>
+    <string name="accederGoogle">Acceder con Google</string>
+</resources>

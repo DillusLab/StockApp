@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "326640735668",
+    "firebase_url": "https://app-19000.firebaseio.com",
+    "project_id": "app-19000",
+    "storage_bucket": "app-19000.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:326640735668:android:bc0d81cc5b61a0c9b80ee1",
+        "android_client_info": {
+          "package_name": "com.example.dillus.stockapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "326640735668-gvaaho96q8vocjp7kn2e77hmo9ksd311.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9DtH_Q3N31TNfjaouNVJtp1wfUOtsnOo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "326640735668-gvaaho96q8vocjp7kn2e77hmo9ksd311.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
