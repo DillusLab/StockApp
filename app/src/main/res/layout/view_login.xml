@@ -10,12 +10,15 @@
         android:id="@+id/imageView"
         android:layout_width="200dp"
         android:layout_height="200dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
         android:contentDescription="@string/app_name"
         android:src="@drawable/ic_stockapp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/colorPrimaryDark" />
 
     <TextView
         android:id="@+id/textViewDescription"
@@ -30,93 +33,45 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
-    <LinearLayout
+    <Button
+        android:id="@+id/btnAccederGoogle"
+        style="@style/styleTextButtom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="32dp"
-        android:orientation="vertical"
+        android:layout_height="@dimen/buttonHeight"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@color/colorWhite"
+        android:contentDescription="@string/app_name"
+        android:text="@string/accederGoogle"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/colorBlack"
+        app:icon="@drawable/ic_google"
+        app:iconGravity="start"
+        app:iconTint="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDescription">
+        app:layout_constraintTop_toBottomOf="@+id/textViewDescription" />
 
-        <com.google.android.material.button.MaterialButton
-            style="@style/Widget.MaterialComponents.Button.Icon"
-            app:icon="@drawable/ic_google"
-            app:iconGravity="start"
-            android:layout_width="match_parent"
-            android:layout_height="56dp" />
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardViewAccederCorreo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:elevation="@dimen/elevation"
-            app:cardBackgroundColor="@color/googleRed"
-            app:cardCornerRadius="@dimen/cornerRadius"
-            app:contentPadding="8dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                tools:ignore="UseCompoundDrawables">
-
-                <ImageView
-                    android:layout_width="@dimen/iconSize"
-                    android:layout_height="@dimen/iconSize"
-                    android:contentDescription="@string/app_name"
-                    android:src="@drawable/ic_email"
-                    android:tint="@color/colorWhite"
-                    tools:ignore="UseAppTint" />
-
-                <TextView
-                    style="@style/styleTextButtom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/accederCorreo"
-                    android:textColor="@color/colorWhite" />
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardViewAccederGoogle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="@dimen/elevation"
-            app:cardBackgroundColor="@color/colorWhite"
-            app:cardCornerRadius="@dimen/cornerRadius"
-            app:contentPadding="8dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                tools:ignore="UseCompoundDrawables">
-
-                <ImageView
-                    android:layout_width="@dimen/iconSize"
-                    android:layout_height="@dimen/iconSize"
-                    android:contentDescription="@string/app_name"
-                    android:src="@drawable/ic_google" />
-
-                <TextView
-                    style="@style/styleTextButtom"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="@string/accederGoogle"
-                    android:textColor="@color/colorBlack" />
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-    </LinearLayout>
+    <Button
+        android:id="@+id/btnAccederCorreo"
+        style="@style/styleTextButtom"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/buttonHeight"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:backgroundTint="@color/colorGoogleRed"
+        android:contentDescription="@string/app_name"
+        android:text="@string/accederCorreo"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/colorWhite"
+        app:icon="@drawable/ic_email"
+        app:iconGravity="start"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnAccederGoogle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

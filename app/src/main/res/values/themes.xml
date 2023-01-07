@@ -16,7 +16,7 @@
 
     <!-- TODO: Custom Style -->
     <style name="styleTextButtom">
-        <item name="android:textSize">@dimen/textSizeBodyLarge</item>
+        <item name="android:textSize">@dimen/textSizeTitleMedium</item>
         <item name="android:textStyle">normal</item>
     </style>
 
