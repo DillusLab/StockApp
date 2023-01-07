@@ -15,7 +15,8 @@
         android:src="@drawable/ic_stockapp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/colorPrimary" />
 
     <TextView
         android:id="@+id/textViewDescription"
@@ -42,11 +43,16 @@
         app:layout_constraintTop_toBottomOf="@+id/textViewDescription">
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAccederGoogle"
             style="@style/Widget.MaterialComponents.Button.Icon"
             app:icon="@drawable/ic_google"
             app:iconGravity="start"
+            android:backgroundTint="@color/colorWhite"
+            android:textColor="@color/colorBlack"
+            android:textAlignment="textStart"
+            android:text="@string/accederGoogle"
             android:layout_width="match_parent"
-            android:layout_height="56dp" />
+            android:layout_height="64dp" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardViewAccederCorreo"
