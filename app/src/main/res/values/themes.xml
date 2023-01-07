@@ -17,7 +17,8 @@
     <!-- TODO: Custom Style -->
     <style name="styleTextButtom">
         <item name="android:textSize">@dimen/textSizeTitleMedium</item>
-        <item name="android:textStyle">normal</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="styleTextDescription">

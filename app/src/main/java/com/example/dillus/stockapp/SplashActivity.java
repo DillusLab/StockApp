@@ -21,7 +21,9 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.example.dillus.stockapp.UI.LoginActivity;
 import com.example.dillus.stockapp.UI.MainActivity;
+import com.firebase.ui.auth.AuthMethodPickerLayout;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -34,7 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @SuppressLint("CustomSplashScreen")
-public class    SplashActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity {
 
     private long countDown;
 
@@ -52,7 +54,7 @@ public class    SplashActivity extends AppCompatActivity {
 
         inicializarCampos();
 
-        if(getIntent().getExtras() != null)
+        if (getIntent().getExtras() != null)
             countDown = getIntent().getExtras().getLong(STRING_COUNTDOWN);
         else
             countDown = COUNTDOWN;
@@ -74,19 +76,25 @@ public class    SplashActivity extends AppCompatActivity {
 
                     public void onFinish() {
                         FirebaseUser user = firebaseAuth.getCurrentUser();
-                        if(user != null){
+                        if (user != null) {
                             //Toast.makeText(SplashActivity.this, "Bienvenido " + user.getDisplayName(), Toast.LENGTH_SHORT).show();
                             goMain();
                         } else {
-                            AuthUI.IdpConfig googleIdp = new AuthUI.IdpConfig.GoogleBuilder().build();
+                            goLogin();
+                            /*AuthUI.IdpConfig googleIdp = new AuthUI.IdpConfig.GoogleBuilder().build();
+
+                            AuthMethodPickerLayout customLayout = new AuthMethodPickerLayout
+                                    .Builder(R.layout.view_login)
+                                    .setEmailButtonId(R.id.btnAccederCorreo)
+                                    .setGoogleButtonId(R.id.btnAccederGoogle)
+                                    .build();
 
                             startActivityForResult(AuthUI.getInstance().
                                     createSignInIntentBuilder()
                                     .setIsSmartLockEnabled(false)
-                                    .setLogo(R.drawable.ic_stockapp)
                                     .setAvailableProviders(Arrays.asList(new AuthUI.IdpConfig.EmailBuilder().build(), googleIdp))
-
-                                    .build(), REQUEST_CODE_SIGN_IN);
+                                    .setAuthMethodPickerLayout(customLayout)
+                                    .build(), REQUEST_CODE_SIGN_IN);*/
                         }
                     }
                 }.start();
@@ -94,9 +102,17 @@ public class    SplashActivity extends AppCompatActivity {
         };
     }
 
-    /** ╠════════════════════ Methods ════════════════════╣ **/
+    /**
+     * ╠════════════════════ Methods ════════════════════╣
+     **/
     private void inicializarCampos() {
         //tvSplashText = findViewById(R.id.tvSplashText);
+    }
+
+    private void goLogin(){
+        Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+        this.finish();
+        startActivity(intent);
     }
 
     private void goMain() {
@@ -105,13 +121,15 @@ public class    SplashActivity extends AppCompatActivity {
         this.finish();
     }
 
-    /** ╠════════════════════ Methods Firebase ════════════════════╣ **/
+    /**
+     * ╠════════════════════ Methods Firebase ════════════════════╣
+     **/
     private void saveDataFirebase() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            String _id =user.getUid();
-            String _name =user.getDisplayName();
-            String _email =user.getEmail();
+            String _id = user.getUid();
+            String _name = user.getDisplayName();
+            String _email = user.getEmail();
             Uri _photoUrl = user.getPhotoUrl();
 
             Map<String, Object> map = new HashMap<>();
@@ -139,11 +157,13 @@ public class    SplashActivity extends AppCompatActivity {
         }
     }
 
-    /** ╠════════════════════ @Override ════════════════════╣ **/
+    /**
+     * ╠════════════════════ @Override ════════════════════╣
+     **/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CODE_SIGN_IN && resultCode == RESULT_OK){
+        if (requestCode == REQUEST_CODE_SIGN_IN && resultCode == RESULT_OK) {
             //Guardar Datos en DB Firestore y DB Local
             //saveDataFirebase();
             goMain();
@@ -161,7 +181,7 @@ public class    SplashActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if(mAuthStateListener != null){
+        if (mAuthStateListener != null) {
             mfirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
     }

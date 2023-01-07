@@ -25,7 +25,7 @@
     <dimen name="elevation">8dp</dimen>
 
     <dimen name="iconSize">32dp</dimen>
-    <dimen name="buttonHeight">64dp</dimen>
+    <dimen name="buttonHeight">56dp</dimen>
     <dimen name="iconToolBarSize">48dp</dimen>
     <dimen name="editTextSize">48dp</dimen>
     <dimen name="cornerRadius">4dp</dimen>
