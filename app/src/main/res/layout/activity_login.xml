@@ -56,18 +56,13 @@
 
         <EditText
             android:id="@+id/etLoginEmail"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/editTextSize"
-            android:background="@null"
             android:hint="@string/exampleGmail"
             android:imeOptions="actionNext"
             android:importantForAutofill="no"
             android:inputType="textEmailAddress"
-            android:minHeight="48dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:textColorHint="#78909C"
-            android:textSize="22sp" />
+            style="@style/styleEditText"/>
 
     </LinearLayout>
 
@@ -102,11 +97,9 @@
             android:imeOptions="actionNext"
             android:importantForAutofill="no"
             android:inputType="textPassword"
-            android:minHeight="48dp"
             android:paddingStart="10dp"
             android:paddingEnd="10dp"
-            android:textColorHint="#78909C"
-            android:textSize="22sp" />
+            style="@style/styleEditText" />
 
 
     </LinearLayout>
