@@ -3,7 +3,7 @@ package com.example.dillus.stockapp.AppLib;
 public class Clslibrary {
 
     // REQUEST CODE
-    public static final int REQUEST_CODE_SIGN_IN = 10001;
+    public static final int REQUEST_CODE_GOOGLE_SIGN_IN = 10001;
 
     // DATABASE FIREBASE
     public static final String COLLECTION_USERS = "users";
@@ -20,6 +20,9 @@ public class Clslibrary {
     // COUNT DOWN
     public static final String STRING_COUNTDOWN = "STRING_COUNTDOWN";
     public static final long COUNTDOWN_0 = 0;
-    public static final long COUNTDOWN = 3000;
+    public static final long COUNTDOWN = 2000;
+
+    // TRANSITION
+    public static final long DURATION_TRANSITION = 2000;
 
 }

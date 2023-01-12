@@ -5,11 +5,13 @@
 
     <string name="accederCorreo">Acceder con el correo electrónico</string>
     <string name="accederGoogle">Acceder con Google</string>
-
     <string name="iniciarSesion">Iniciar Sesión</string>
     <string name="exampleGmail">example@gmail.com</string>
     <string name="hintPassword">***********</string>
     <string name="acceder">Acceder</string>
     <string name="registrarse">Registrarse</string>
     <string name="nombreUsuario">nombre usuario</string>
+    <string name="exampleTienda">example tienda</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

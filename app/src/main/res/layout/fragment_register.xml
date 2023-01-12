@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UI.Fragment_Session.RegisterFragment">
+
+    <LinearLayout
+        android:id="@+id/layoutToolbar"
+        style="@style/styleActionBarLinearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/imgButtonFragmentRegisterBack"
+            android:layout_width="@dimen/iconToolBarSize"
+            android:layout_height="@dimen/iconToolBarSize"
+            android:background="@null"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_arrow_back"
+            android:tint="@color/colorWhite"
+            tools:ignore="UseAppTint,DuplicateSpeakableTextCheck" />
+
+        <TextView
+            android:id="@+id/tvMainTitle"
+            style="@style/styleTextActionBarTitle"
+            android:text="@string/registrarse" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imgFragmentRegisterStockApp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_stockapp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutToolbar"
+        app:tint="@color/colorPrimaryDark" />
+
+    <LinearLayout
+        android:id="@+id/llRegisterName"
+        style="@style/styleEditTextLinearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgFragmentRegisterStockApp">
+
+        <ImageView
+            android:id="@+id/imgFragmentRegisterName"
+            android:layout_width="@dimen/iconSize"
+            android:layout_height="@dimen/iconSize"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_profile"
+            android:tint="@color/colorPrimary"
+            tools:ignore="UseAppTint" />
+
+        <EditText
+            android:id="@+id/etFragmentRegisterName"
+            style="@style/styleEditText"
+            android:hint="@string/nombreUsuario"
+            android:importantForAutofill="no"
+            android:inputType="textCapWords" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llRegisterEmail"
+        style="@style/styleEditTextLinearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llRegisterName">
+
+        <ImageView
+            android:id="@+id/imgFragmentRegisterEmail"
+            android:layout_width="@dimen/iconSize"
+            android:layout_height="@dimen/iconSize"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_email"
+            android:tint="@color/colorPrimary"
+            tools:ignore="UseAppTint" />
+
+        <EditText
+            android:id="@+id/etFragmentRegisterEmail"
+            style="@style/styleEditText"
+            android:hint="@string/exampleGmail"
+            android:importantForAutofill="no"
+            android:inputType="textEmailAddress" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/llRegisterPassword"
+        style="@style/styleEditTextLinearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llRegisterEmail">
+
+        <ImageView
+            android:id="@+id/imgFragmentRegisterPassword"
+            android:layout_width="@dimen/iconSize"
+            android:layout_height="@dimen/iconSize"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_password"
+            android:tint="@color/colorPrimary"
+            tools:ignore="UseAppTint"/>
+
+        <EditText
+            android:id="@+id/etFragmentRegisterPassword"
+            style="@style/styleEditText"
+            android:hint="@string/hintPassword"
+            android:importantForAutofill="no"
+            android:inputType="textPassword" />
+
+        <ImageView
+            android:id="@+id/imgFragmentRegisterPasswordVisibility"
+            android:layout_width="@dimen/iconSize"
+            android:layout_height="@dimen/iconSize"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_visibility"
+            android:tint="@color/colorDisable"
+            tools:ignore="UseAppTint"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnFragmentRegisterRegister"
+        style="@style/styleButtonEssential"
+        android:text="@string/registrarse"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/llRegisterPassword"
+        tools:ignore="DuplicateSpeakableTextCheck" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
