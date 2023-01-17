@@ -4,17 +4,29 @@ public class Clslibrary {
 
     // REQUEST CODE
     public static final int REQUEST_CODE_GOOGLE_SIGN_IN = 10001;
+    public static final int REQUEST_CODE_ADD_TIENDA = 10002;
+
+    // ACTIVITY MODE STRING
+    public static final String MODE_STRING_NUEVO = "MODE_NUEVO";
+    public static final String MODE_STRING_EDITAR = "MODE_EDITAR";
+
+    // ACTIVITY MODE
+    public static final String MODE_NUEVO = "MODE_NUEVO";
+    public static final String MODE_EDITAR = "MODE_EDITAR";
 
     // DATABASE FIREBASE
     public static final String COLLECTION_USERS = "users";
     public static final String COLLECTION_CATEGORIA = "categoria";
     public static final String COLLECTION_TIENDA = "tienda";
+    public static final String COLLECTION_USER_TIENDA = "user_tienda";
 
     // CAMPO ATRIBUTOS
     public static final String FIREBASE_ID = "id";
     public static final String FIREBASE_NAME = "name";
     public static final String FIREBASE_EMAIL = "email";
     public static final String FIREBASE_PASSWORD = "password";
+    public static final String FIREBASE_DESCRIPTION = "description";
+    public static final String FIREBASE_URI = "uri";
 
 
     // COUNT DOWN

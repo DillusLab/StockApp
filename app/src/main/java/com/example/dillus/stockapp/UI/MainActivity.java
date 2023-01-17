@@ -46,7 +46,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         inicializarCampos();
+        onClickEvent();
 
+    }
+    /** ╠════════════════════ Methods ════════════════════╣ **/
+    private void onClickEvent(){
         imgMainMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,18 +58,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        navigationView.setItemIconTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
-
-        NavigationUI.setupWithNavController(navigationView,navController);
-
         navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
             @Override
             public void onDestinationChanged(@NonNull NavController navController, @NonNull NavDestination navDestination, @Nullable Bundle bundle) {
                 tvMainTitle.setText(navDestination.getLabel());
             }
         });
-
     }
+
     /** ╠════════════════════ Methods ════════════════════╣ **/
     private void inicializarCampos() {
         // Navigation Drower an components
@@ -74,10 +74,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Navigation View
         navigationView = findViewById(R.id.navigationView);
+        navigationView.setItemIconTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
 
         // Navigation Controller
         navController = Navigation.findNavController(this, R.id.navMainFragment);
         tvMainTitle = findViewById(R.id.tvMainTitle);
+
+        NavigationUI.setupWithNavController(navigationView,navController);
 
         //Navigation Header Items
         View header = navigationView.getHeaderView(0);

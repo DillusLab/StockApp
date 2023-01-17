@@ -29,4 +29,6 @@
     <dimen name="iconToolBarSize">48dp</dimen>
     <dimen name="editTextSize">48dp</dimen>
     <dimen name="cornerRadius">4dp</dimen>
+
+    <dimen name="cornerRadiusImage">20dp</dimen>
 </resources>

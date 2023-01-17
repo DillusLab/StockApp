@@ -84,6 +84,11 @@
         <item name="android:textSize">@dimen/textSizeTitleLarge</item>
     </style>
 
+    <style name="styleEditTextTitle">
+        <item name="android:textSize">@dimen/textSizeBodyMedium</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!-- ActioinBar Style -->
     <style name="styleActionBarLinearLayout">
         <item name="android:layout_width">match_parent</item>

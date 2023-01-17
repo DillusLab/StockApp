@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".UI.Activities.TiendaActivity">
+
+    <LinearLayout
+        android:id="@+id/layoutToolbar"
+        style="@style/styleActionBarLinearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/imgButtonTiendaBack"
+            android:layout_width="@dimen/iconToolBarSize"
+            android:layout_height="@dimen/iconToolBarSize"
+            android:background="@null"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_arrow_back"
+            android:tint="@color/colorWhite"
+            tools:ignore="UseAppTint,DuplicateSpeakableTextCheck" />
+
+        <TextView
+            android:id="@+id/tvMainTitle"
+            style="@style/styleTextActionBarTitle"
+            android:text="@string/tienda" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutToolbar">
+
+        <TextView
+            android:id="@+id/tvTiendaID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@string/id"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tvTiendaIDCadena"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/imgTiendaMarca"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_marca"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutID"
+        app:riv_corner_radius="@dimen/cornerRadiusImage" />
+
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/imgTiendaPicturePicker"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@color/colorDisable"
+        android:padding="8dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_camera"
+        app:layout_constraintBottom_toBottomOf="@+id/imgTiendaMarca"
+        app:layout_constraintEnd_toEndOf="@+id/imgTiendaMarca"
+        app:layout_constraintStart_toStartOf="@+id/imgTiendaMarca"
+        app:layout_constraintTop_toBottomOf="@+id/imgTiendaMarca"
+        app:riv_mutate_background="true"
+        app:riv_oval="true" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintTienda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgTiendaMarca">
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            style="@style/styleEditTextLinearLayout"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/etTiendaNombreTienda"
+                style="@style/styleEditText"
+                android:hint="@string/tienda"
+                android:importantForAutofill="no"
+                android:inputType="textEmailAddress" />
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/styleEditTextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:background="@color/colorWhite"
+            android:padding="4dp"
+            android:text="@string/tienda"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimaryDark"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout1"
+            app:layout_constraintStart_toStartOf="@+id/linearLayout1"
+            app:layout_constraintTop_toTopOf="@+id/linearLayout1" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintTienda">
+
+        <LinearLayout
+            android:id="@+id/linearLayout2"
+            style="@style/styleEditTextLinearLayout"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <EditText
+                android:id="@+id/etFragmentRegisterEmail"
+                style="@style/styleEditText"
+                android:hint="@string/descripcion"
+                android:importantForAutofill="no"
+                android:inputType="textEmailAddress" />
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/styleEditTextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:background="@color/colorWhite"
+            android:padding="4dp"
+            android:text="@string/descripcion"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimaryDark"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+            app:layout_constraintStart_toStartOf="@+id/linearLayout2"
+            app:layout_constraintTop_toTopOf="@+id/linearLayout2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <Button
+        android:id="@+id/btnTiendaAdd"
+        style="@style/styleButtonEssential"
+        android:text="@string/agregar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+</androidx.constraintlayout.widget.ConstraintLayout>
