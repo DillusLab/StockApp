@@ -8,21 +8,18 @@ import static com.example.dillus.stockapp.AppLib.ClsMessage.msgRequiredFields;
 import static com.example.dillus.stockapp.AppLib.ClsMessageErrorFirebase.msgErrorFirebase_NetworkError;
 import static com.example.dillus.stockapp.AppLib.ClsMessageErrorFirebase.msgErrorFirebase_NoPasswordExits;
 import static com.example.dillus.stockapp.AppLib.ClsMessageErrorFirebase.msgErrorFirebase_NoUserExits;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.COLLECTION_USERS;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_EMAIL;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_ID;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_NAME;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_PASSWORD;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_PROVIDER;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.PROVIDER_GOOGLE_ACCOUNT;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.REQUEST_CODE_GOOGLE_SIGN_IN;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.SharedElementCallback;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +28,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.dillus.stockapp.R;
 import com.example.dillus.stockapp.UI.MainActivity;
@@ -48,7 +56,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class LoginFragment extends Fragment {
@@ -59,12 +70,15 @@ public class LoginFragment extends Fragment {
     private ProgressBar progressbarFragmentLogin;
 
     private FirebaseAuth mfirebaseAuth;
+    private FirebaseFirestore mfireStore;
 
     private GoogleSignInClient mGoogleSignInClient;
 
     private Context context;
 
     private NavController navController;
+
+    private ActivityResultLauncher<Intent> googleSignIn_ActivityResult;
 
     public LoginFragment() {
 
@@ -91,6 +105,7 @@ public class LoginFragment extends Fragment {
 
         // Initialize Firebase Auth
         mfirebaseAuth = FirebaseAuth.getInstance();
+        mfireStore = FirebaseFirestore.getInstance();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
@@ -208,7 +223,37 @@ public class LoginFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        goMain();
+                        if(authResult.getUser() != null){
+                            Map<String, Object> map = new HashMap<>();
+                            map.put(FIREBASE_ID, authResult.getUser().getUid());
+                            map.put(FIREBASE_NAME, authResult.getUser().getDisplayName());
+                            map.put(FIREBASE_EMAIL, authResult.getUser().getEmail());
+                            map.put(FIREBASE_PROVIDER, PROVIDER_GOOGLE_ACCOUNT);
+                            map.put(FIREBASE_PASSWORD, "");
+                            mfireStore.collection(COLLECTION_USERS).document(authResult.getUser().getUid()).set(map)
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void unused) {
+                                                    x
+                                                    // VERIFICAR TIENDAS
+                                                    //goMain();
+                                                }
+                                            })
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                        }
+                                    }).addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+
+                                        }
+                                    });
+
+                            Toast.makeText(context, authResult.getUser().getDisplayName(), Toast.LENGTH_SHORT).show();
+                            goMain();
+                        }
                     }
                 })
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -267,6 +312,29 @@ public class LoginFragment extends Fragment {
             btnFragmentLoginAccederGoogle.setEnabled(true);
         }
     }
+
+    /** ╠════════════════════ ACTIVITY RESULT ════════════════════╣ **/
+    private void activityResult(){
+        googleSignIn_ActivityResult = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        if(result.getResultCode() == RESULT_OK){
+                            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
+                            if(task.isSuccessful()){
+                                try {
+                                    GoogleSignInAccount account = task.getResult(ApiException.class);
+                                    firebaseAuthWithGoogle(account.getIdToken());
+                                } catch (ApiException e){
+                                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
     /** ╠════════════════════ Override ════════════════════╣ **/
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

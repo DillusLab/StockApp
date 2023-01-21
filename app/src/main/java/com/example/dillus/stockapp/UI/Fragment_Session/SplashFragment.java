@@ -36,7 +36,7 @@ public class SplashFragment extends Fragment {
     private FirebaseAuth mfirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
-    private FirebaseFirestore mfireStore;
+    //private FirebaseFirestore mfireStore;
 
     private NavController navController;
 
@@ -68,7 +68,7 @@ public class SplashFragment extends Fragment {
 
         //Initialize Firebase Auth y Firestore
         mfirebaseAuth = FirebaseAuth.getInstance();
-        mfireStore = FirebaseFirestore.getInstance();
+        //mfireStore = FirebaseFirestore.getInstance();
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
