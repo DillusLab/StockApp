@@ -14,12 +14,14 @@ import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_ID;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_NAME;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_PASSWORD;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_PROVIDER;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_TIENDAS;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.PROVIDER_GOOGLE_ACCOUNT;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.REQUEST_CODE_GOOGLE_SIGN_IN;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,9 +58,14 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -102,6 +109,7 @@ public class LoginFragment extends Fragment {
         inicializarCampos(view);
         onClickEvent();
         onLoading(false);
+        activityResult();
 
         // Initialize Firebase Auth
         mfirebaseAuth = FirebaseAuth.getInstance();
@@ -117,12 +125,14 @@ public class LoginFragment extends Fragment {
 
     }
 
-    /** ╠════════════════════ Events ════════════════════╣ **/
-    private void onClickEvent(){
+    /**
+     * ╠════════════════════ Events ════════════════════╣
+     **/
+    private void onClickEvent() {
         btnFragmentLoginAcceder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(onValidarCampos()){
+                if (onValidarCampos()) {
                     onLoading(true);
                     onSignInExistingUser();
                 }
@@ -145,7 +155,9 @@ public class LoginFragment extends Fragment {
 
     }
 
-    /** ╠════════════════════ Methods ════════════════════╣ **/
+    /**
+     * ╠════════════════════ Methods ════════════════════╣
+     **/
     private void inicializarCampos(View view) {
         navController = Navigation.findNavController(view);
 
@@ -162,10 +174,10 @@ public class LoginFragment extends Fragment {
     }
 
     private boolean onValidarCampos() {
-        if(etFragmentLoginEmail.getText().toString().trim().isEmpty())
+        if (etFragmentLoginEmail.getText().toString().trim().isEmpty())
             etFragmentLoginEmail.setError(msgRequiredFields);
 
-        if(etFragmentLoginPassword.getText().toString().trim().isEmpty())
+        if (etFragmentLoginPassword.getText().toString().trim().isEmpty())
             etFragmentLoginPassword.setError(msgRequiredFields);
 
         return !etFragmentLoginEmail.getText().toString().trim().isEmpty() && !etFragmentLoginPassword.getText().toString().trim().isEmpty();
@@ -182,12 +194,13 @@ public class LoginFragment extends Fragment {
         clearData();
     }
 
-    private void clearData(){
+    private void clearData() {
         etFragmentLoginEmail.setText("");
         etFragmentLoginPassword.setText("");
     }
+
     // Iniciar Sesion con usuario existente
-    private void onSignInExistingUser(){
+    private void onSignInExistingUser() {
         mfirebaseAuth.signInWithEmailAndPassword(etFragmentLoginEmail.getText().toString(), etFragmentLoginPassword.getText().toString())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
@@ -214,7 +227,8 @@ public class LoginFragment extends Fragment {
 
     private void onSignInGoogle() {
         Intent intent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(intent, REQUEST_CODE_GOOGLE_SIGN_IN);
+        googleSignIn_ActivityResult.launch(intent);
+        //startActivityForResult(intent, REQUEST_CODE_GOOGLE_SIGN_IN);
     }
 
     private void firebaseAuthWithGoogle(String idToken) {
@@ -223,22 +237,27 @@ public class LoginFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        if(authResult.getUser() != null){
+                        if (authResult.getUser() != null) {
                             Map<String, Object> map = new HashMap<>();
+
+                            Map<String, Object> map_tiendas = new HashMap<>();
+                            List<Map<String, Object>> lista_tiendas = new ArrayList<>();
+
                             map.put(FIREBASE_ID, authResult.getUser().getUid());
                             map.put(FIREBASE_NAME, authResult.getUser().getDisplayName());
                             map.put(FIREBASE_EMAIL, authResult.getUser().getEmail());
                             map.put(FIREBASE_PROVIDER, PROVIDER_GOOGLE_ACCOUNT);
                             map.put(FIREBASE_PASSWORD, "");
+                            map.put(FIREBASE_TIENDAS, lista_tiendas);
                             mfireStore.collection(COLLECTION_USERS).document(authResult.getUser().getUid()).set(map)
                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void unused) {
-                                                    x
-                                                    // VERIFICAR TIENDAS
-                                                    //goMain();
-                                                }
-                                            })
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            obtenerTiendas(authResult.getUser().getUid());
+                                            // VERIFICAR TIENDAS
+                                            //goMain();
+                                        }
+                                    })
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
@@ -252,7 +271,6 @@ public class LoginFragment extends Fragment {
                                     });
 
                             Toast.makeText(context, authResult.getUser().getDisplayName(), Toast.LENGTH_SHORT).show();
-                            goMain();
                         }
                     }
                 })
@@ -270,11 +288,38 @@ public class LoginFragment extends Fragment {
                 });
     }
 
-    private void showMessageError(String msg){
-        if(msg.equals(msgErrorFirebase_NoPasswordExits))
+    private void obtenerTiendas(String uid) {
+        Map<String, Object> map = new HashMap<>();
+        map.put(FIREBASE_ID, "asdasdasd");
+        mfireStore.collection(COLLECTION_USERS)
+                .document(uid)
+                .collection(FIREBASE_TIENDAS)asdasd
+                .add(map)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Toast.makeText(context, "SUCCESS", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        Toast.makeText(context, "DONE", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void showMessageError(String msg) {
+        if (msg.equals(msgErrorFirebase_NoPasswordExits))
             Toast.makeText(context, msgNoPasswordExits, Toast.LENGTH_SHORT).show();
 
-        else if(msg.equals(msgErrorFirebase_NoUserExits))
+        else if (msg.equals(msgErrorFirebase_NoUserExits))
             Toast.makeText(context, msgNoUserExits, Toast.LENGTH_SHORT).show();
 
         else if (msg.equals(msgErrorFirebase_NetworkError))
@@ -284,9 +329,9 @@ public class LoginFragment extends Fragment {
             Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void onLoading(boolean flag){
+    private void onLoading(boolean flag) {
         // TRUE -> Loading
-        if(flag) {
+        if (flag) {
             imgFragmentLoginEmail.setImageTintList(ContextCompat.getColorStateList(context, R.color.colorDisable));
             imgFragmentLoginPassword.setImageTintList(ContextCompat.getColorStateList(context, R.color.colorDisable));
 
@@ -313,20 +358,22 @@ public class LoginFragment extends Fragment {
         }
     }
 
-    /** ╠════════════════════ ACTIVITY RESULT ════════════════════╣ **/
-    private void activityResult(){
+    /**
+     * ╠════════════════════ ACTIVITY RESULT ════════════════════╣
+     **/
+    private void activityResult() {
         googleSignIn_ActivityResult = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        if(result.getResultCode() == RESULT_OK){
+                        if (result.getResultCode() == RESULT_OK) {
                             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(result.getData());
-                            if(task.isSuccessful()){
+                            if (task.isSuccessful()) {
                                 try {
                                     GoogleSignInAccount account = task.getResult(ApiException.class);
                                     firebaseAuthWithGoogle(account.getIdToken());
-                                } catch (ApiException e){
+                                } catch (ApiException e) {
                                     Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -335,17 +382,19 @@ public class LoginFragment extends Fragment {
                 });
     }
 
-    /** ╠════════════════════ Override ════════════════════╣ **/
+    /**
+     * ╠════════════════════ Override ════════════════════╣
+     **/
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_GOOGLE_SIGN_IN && resultCode == RESULT_OK) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            if(task.isSuccessful()){
+            if (task.isSuccessful()) {
                 try {
                     GoogleSignInAccount account = task.getResult(ApiException.class);
                     firebaseAuthWithGoogle(account.getIdToken());
-                } catch (ApiException e){
+                } catch (ApiException e) {
                     Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }

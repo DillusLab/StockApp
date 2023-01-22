@@ -19,19 +19,22 @@ public class Clslibrary {
     public static final String COLLECTION_USERS = "users";
     public static final String COLLECTION_CATEGORIA = "categoria";
     public static final String COLLECTION_TIENDA = "tienda";
-    public static final String COLLECTION_USER_TIENDA = "user_tienda";
 
     // FIREBASE STORAGE
     public static final String STORAGE_PATH_TIENDA_LOGO = "tienda_logo";
 
     // CAMPO ATRIBUTOS
+    public static final String FIREBASE_ID = "id_";
+    public static final String FIREBASE_ID = "id";
+    public static final String FIREBASE_ID = "id";
     public static final String FIREBASE_ID = "id";
     public static final String FIREBASE_NAME = "name";
     public static final String FIREBASE_EMAIL = "email";
     public static final String FIREBASE_PASSWORD = "password";
     public static final String FIREBASE_DESCRIPTION = "description";
-    public static final String FIREBASE_PROVIDER = "tipo";
+    public static final String FIREBASE_PROVIDER = "provider";
     public static final String FIREBASE_URI = "uri";
+    public static final String FIREBASE_TIENDAS = "tiendas";
 
     // PROVIDER
     public static final String PROVIDER_GOOGLE_ACCOUNT = "GOOGLE_ACCOUNT";
