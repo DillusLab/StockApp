@@ -35,6 +35,10 @@ dependencies {
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
+    implementation "androidx.recyclerview:recyclerview:1.2.1"
+    // For control over item selection of both touch and mouse driven selection
+    implementation "androidx.recyclerview:recyclerview-selection:1.1.0"
+
     // FireBase
     implementation 'com.firebaseui:firebase-ui-auth:8.0.2'
     implementation 'com.google.firebase:firebase-auth:21.1.0'
@@ -62,4 +66,7 @@ dependencies {
 
     // Crop Image
     implementation 'com.github.krokyze:ucropnedit:2.2.8'
+
+    // Code bar scanner
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
 }

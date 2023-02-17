@@ -8,15 +8,32 @@
     <color name="colorPrimaryDarkText">#31394A</color>
     <color name="colorHint">#78909C</color>
 
+    <!--<color name="colorPrimary">#CB4A67</color>
+    <color name="colorPrimaryDark">#854262</color>
+    <color name="colorAccent">#DC927A</color>
+
+    <color name="colorPrimaryDarkText">#444569</color>
+    <color name="colorHint">#78909C</color>-->
+
     <color name="colorBlack">#292D33</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorWhiteBlue">#E9F3FC</color>
 
     <color name="colorDisable">#DADADA</color>
-
     <color name="colorDivider">#DEDEDE</color>
 
     <color name="colorGoogleRed">#D0121E</color>
+
+    <color name="colorRed">#A41515</color>
+    <color name="colorBlue">#3B569F</color>
+    <color name="colorGreen">#459D57</color>
+    <color name="colorYellow">#F1DA4F</color>
+    <color name="colorOrange">#C95D27</color>
+    <color name="colorGray">#677180</color>
+    <color name="colorPurple">#4B3C8B</color>
+
+
+
 
     <!--<color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>

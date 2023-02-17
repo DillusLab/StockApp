@@ -8,8 +8,5 @@ public class ClsMessageErrorFirebase {
 
     public static String msgErrorFirebase_NetworkError = "A network error (such as timeout, interrupted connection or unreachable host) has occurred.";
 
-
-
-
-
+    public static String msgErrorFirebase_EmailExists = "The email address is already in use by another account.";
 }

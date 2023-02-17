@@ -1,12 +1,21 @@
 package com.example.dillus.stockapp.UI.Activities;
 
+import static com.example.dillus.stockapp.AppLib.ClsMessage.msgRequiredFields;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.COLLECTION_TIENDA;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.COLLECTION_USER_TIENDA;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.EXTENSION_JPG;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_DESCRIPTION;
-import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_ID;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_ID_TIENDA;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_ID_USER;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_NAME;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_URI;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.MODE_EDITAR;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.MODE_FIRST_TIME;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.MODE_INTENT;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.MODE_NUEVO;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.REQUEST_CODE_CAMERA_PERMISSIONS;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.REQUEST_CODE_GALERY_PERMISSIONS;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.RESOLUCION_IMAGE;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.STORAGE_PATH_TIENDA_LOGO;
 
 import android.Manifest;
@@ -15,20 +24,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -41,10 +46,15 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.example.dillus.stockapp.AppData.ClsTienda;
+import com.example.dillus.stockapp.AppLib.ClsShowMessage;
+import com.example.dillus.stockapp.AppPreferences.PreferTienda;
 import com.example.dillus.stockapp.BuildConfig;
 import com.example.dillus.stockapp.R;
+import com.example.dillus.stockapp.UI.MainActivity;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -56,32 +66,39 @@ import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 public class TiendaActivity extends AppCompatActivity {
 
-    private FirebaseFirestore mfireStore;
     private ClsTienda clsTienda;
 
     private TextView tvTiendaIDCadena;
+    private ImageButton imgButtonTiendaBack;
+
+    private ProgressBar progressbarActivityTienda;
+
     private RoundedImageView imgTiendaMarca, imgTiendaPicturePicker;
-    private EditText etTiendaNombreTienda, etFragmentRegisterEmail;
+    private EditText etTiendaNombreTienda, etTiendaRegisterDescripcion;
+
     private Button btnTiendaAdd;
 
     private FirebaseAuth mfirebaseAuth;
+    private FirebaseFirestore mfireStore;
 
-    private  ActivityResultLauncher<Intent> cameraLauncher;
+    private ActivityResultLauncher<Intent> cameraLauncher;
     private ActivityResultLauncher<Intent> galeryLauncher;
 
-    private String ID_TIENDA;
     private String imageFilePath;
     private Uri imageUriUpload;
+
+    private Context context;
+
+    private String _MODE;
+
+    private ClsShowMessage clsShowMessage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,114 +106,146 @@ public class TiendaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_tienda);
 
         inicializarCampos();
+        setMode();
         onClickEvent();
         activityResult();
 
+        onLoading(false);
+
+        context = TiendaActivity.this;
+
         // Initialize Firebase Auth
         mfirebaseAuth = FirebaseAuth.getInstance();
+        mfireStore = FirebaseFirestore.getInstance();
     }
 
-    /** ╠════════════════════ Events ════════════════════╣ **/
-private void onClickEvent(){
-    imgTiendaPicturePicker.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            showDialogPhotoOption();
-            //takePhoto();
-        }
-    });
+    /**
+     * ╠════════════════════ Events ════════════════════╣
+     **/
+    private void onClickEvent() {
+        imgButtonTiendaBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-    btnTiendaAdd.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            clsTienda = new ClsTienda();
+            }
+        });
 
-            clsTienda.setId("");
-            clsTienda.setName("Tienda 1");
-            clsTienda.setDescription("Primera Tienda");
-            clsTienda.setUri(null);
+        imgTiendaPicturePicker.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialogPhotoOption();
+                //takePhoto();
+            }
+        });
 
-            addTienda(clsTienda);
-        }
-    });
-}
+        btnTiendaAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (validarCampos()) {
+                    onLoading(true);
+                    clsTienda = new ClsTienda();
 
+                    clsTienda.setId("");
+                    clsTienda.setName(etTiendaNombreTienda.getText().toString().trim());
+                    clsTienda.setDescription(etTiendaRegisterDescripcion.getText().toString().trim());
 
-    /** ╠════════════════════ Methods ════════════════════╣ **/
+                    if (imageUriUpload != null)
+                        clsTienda.setUri(imageUriUpload.toString());
+                    else
+                        clsTienda.setUri(null);
+
+                    addTienda();
+                }
+            }
+        });
+    }
+
+    /**
+     * ╠════════════════════ Methods ════════════════════╣
+     **/
     private void inicializarCampos() {
-        tvTiendaIDCadena  = findViewById(R.id.tvTiendaIDCadena);
-        imgTiendaMarca  = findViewById(R.id.imgTiendaMarca);
-        imgTiendaPicturePicker  = findViewById(R.id.imgTiendaPicturePicker);
-        etTiendaNombreTienda  = findViewById(R.id.etTiendaNombreTienda);
-        etFragmentRegisterEmail  = findViewById(R.id.etFragmentRegisterEmail);
-        btnTiendaAdd  = findViewById(R.id.btnTiendaAdd);
+        clsShowMessage = new ClsShowMessage();
+
+        // Obtener Extras
+        Intent intent = getIntent();
+        _MODE = intent.getStringExtra(MODE_INTENT);
+
+        tvTiendaIDCadena = findViewById(R.id.tvTiendaIDCadena);
+        imgButtonTiendaBack = findViewById(R.id.imgButtonTiendaBack);
+
+        progressbarActivityTienda = findViewById(R.id.progressbarActivityTienda);
+
+        imgTiendaMarca = findViewById(R.id.imgTiendaMarca);
+        imgTiendaPicturePicker = findViewById(R.id.imgTiendaPicturePicker);
+        etTiendaNombreTienda = findViewById(R.id.etTiendaNombreTienda);
+        etTiendaRegisterDescripcion = findViewById(R.id.etTiendaRegisterDescripcion);
+        btnTiendaAdd = findViewById(R.id.btnTiendaAdd);
 
         imageFilePath = null;
         imageUriUpload = null;
     }
 
-    private boolean validarCampos(){
+    private void setMode(){
+        switch (_MODE){
+            case MODE_NUEVO:
+                break;
 
-        return false;
+            case MODE_EDITAR:
+                // Obtener tienda edit
+                break;
+
+            case MODE_FIRST_TIME:
+                imgButtonTiendaBack.setVisibility(View.INVISIBLE);
+                break;
+        }
     }
 
-    private void onLoad(){
+    private boolean validarCampos() {
+        if (etTiendaNombreTienda.getText().toString().trim().isEmpty())
+            etTiendaNombreTienda.setError(msgRequiredFields);
 
+        if (etTiendaRegisterDescripcion.getText().toString().trim().isEmpty())
+            etTiendaRegisterDescripcion.setError(msgRequiredFields);
+
+        return !etTiendaNombreTienda.getText().toString().trim().isEmpty() &&
+                !etTiendaRegisterDescripcion.getText().toString().trim().isEmpty();
     }
 
-    public void addTienda (ClsTienda clsTienda){
+    private void onLoading(boolean flag) {
+        // TRUE -> Loading
+        if (flag) {
+            imgButtonTiendaBack.setEnabled(false);
 
-        mfireStore = FirebaseFirestore.getInstance();
-        Map<String, Object> map = new HashMap<>();
-        map.put(FIREBASE_ID, clsTienda.getId());
-        map.put(FIREBASE_NAME, clsTienda.getName());
-        map.put(FIREBASE_DESCRIPTION, clsTienda.getDescription());
-        map.put(FIREBASE_URI, clsTienda.getUri());
+            imgTiendaPicturePicker.setEnabled(false);
+            etTiendaNombreTienda.setEnabled(false);
+            etTiendaRegisterDescripcion.setEnabled(false);
 
-        mfireStore.collection(COLLECTION_TIENDA)
-                .add(map)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        // UPDATE ID
-                        ID_TIENDA = documentReference.getId();
-                        mfireStore.collection(COLLECTION_TIENDA).document(ID_TIENDA)
-                                .update(FIREBASE_ID, ID_TIENDA)
-                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void unused) {
-                                        uploadImage();
-                                        /*Intent data = new Intent();
-                                        String text = "Result to be returned....";
-                                        data.setData(Uri.parse(text));
-                                        setResult(RESULT_OK, data);
-                                        finish();*/
-                                    }
-                                });
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(TiendaActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Intent data = new Intent();
-                        String text = e.getMessage();
-                        data.setData(Uri.parse(text));
-                        setResult(RESULT_CANCELED, data);
-                        finish();
-                    }
-                });
+            btnTiendaAdd.setEnabled(false);
+
+            progressbarActivityTienda.setVisibility(View.VISIBLE);
+
+        } else {
+            imgButtonTiendaBack.setEnabled(true);
+
+            imgTiendaPicturePicker.setEnabled(true);
+            etTiendaNombreTienda.setEnabled(true);
+            etTiendaRegisterDescripcion.setEnabled(true);
+
+            btnTiendaAdd.setEnabled(true);
+
+            progressbarActivityTienda.setVisibility(View.INVISIBLE);
+        }
     }
 
-    public void showDialogPhotoOption(){
+    public void showDialogPhotoOption() {
         String[] arrayOptions = {"Cámara", "Galería"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(TiendaActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         //builder.setTitle("Tienda Logo");
         builder.setItems(arrayOptions, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case 0:
                         permisoCamera();
                         break;
@@ -211,7 +260,7 @@ private void onClickEvent(){
         dialog.show();
     }
 
-    private void cameraPhoto(){
+    private void cameraPhoto() {
         Intent pictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File photoFile = null;
         try {
@@ -224,51 +273,204 @@ private void onClickEvent(){
         }
     }
 
-    @SuppressLint("IntentReset")
-    private void galeryPhoto(){
-        //mgaleryLauncher.launch("image/*");
+    private void galeryPhoto() {
         galeryLauncher.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
     }
 
-    private void uploadImage(){
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        final StorageReference reference = storage.getReference().child(STORAGE_PATH_TIENDA_LOGO).child(ID_TIENDA);
-        reference.putFile(imageUriUpload)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+    private void goFinish(){
+        Intent data = new Intent();
+        switch (_MODE){
+            case MODE_NUEVO:
+            case MODE_EDITAR:
+                data.setData(Uri.parse(_MODE));
+                setResult(RESULT_OK, data);
+                finish();
+                break;
+
+            case MODE_FIRST_TIME:
+                goMain();
+                break;
+        }
+    }
+
+    private void goMain() {
+        Intent intent = new Intent(context, MainActivity.class);
+        this.finish();
+        startActivity(intent);
+    }
+
+    /* --------------------------------------------------- */
+    // Agregar Tienda
+    public void addTienda() {
+
+        Map<String, Object> map = new HashMap<>();
+        map.put(FIREBASE_ID_TIENDA, clsTienda.getId());
+        map.put(FIREBASE_NAME, clsTienda.getName());
+        map.put(FIREBASE_DESCRIPTION, clsTienda.getDescription());
+        map.put(FIREBASE_URI, clsTienda.getUri());
+
+        mfireStore.collection(COLLECTION_TIENDA)
+                .add(map)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        reference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(Uri uri) {
-                                Log.e("URI", uri.toString());
-                            }
-                        });
+                    public void onSuccess(DocumentReference documentReference) {
+                        // UPDATE ID
+                        clsTienda.setId(documentReference.getId());
+                        tvTiendaIDCadena.setText(clsTienda.getId());
+
+                        updateTiendaID();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
                     }
                 });
     }
 
-    /** ╠════════════════════ PERMISSIONS ════════════════════╣ **/
-    private void permisoCamera(){
-        if(ContextCompat.checkSelfPermission(TiendaActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED){
+    // Update IdTienda
+    private void updateTiendaID() {
+        mfireStore.collection(COLLECTION_TIENDA).document(clsTienda.getId())
+                .update(FIREBASE_ID_TIENDA, clsTienda.getId())
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            if (clsTienda.getUri() != null)
+                                uploadImage();
+                            else
+                                updateTiendaID();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    // Subir imagen a firebase
+    private void uploadImage() {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        final StorageReference reference = storage.getReference().child(STORAGE_PATH_TIENDA_LOGO).child(clsTienda.getId());
+        reference.putFile(Uri.parse(clsTienda.getUri()))
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        reference.getDownloadUrl()
+                                .addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                    @Override
+                                    public void onSuccess(Uri uri) {
+                                        updateTiendaURI(uri);
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                                        onLoading(false);
+                                    }
+                                });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    // Update IdTienda
+    private void updateTiendaURI(Uri _uriTienda) {
+        mfireStore.collection(COLLECTION_TIENDA).document(clsTienda.getId())
+                .update(FIREBASE_URI, _uriTienda)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            addUserTienda();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    // Agregar usuario-tienda
+    private void addUserTienda() {
+        Map<String, Object> map = new HashMap<>();
+        map.put(FIREBASE_ID_USER, mfirebaseAuth.getUid());
+        map.put(FIREBASE_ID_TIENDA, clsTienda.getId());
+
+        mfireStore.collection(COLLECTION_USER_TIENDA).add(map)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                        if (task.isSuccessful()) {
+                            new PreferTienda().setID_TIENDA(context, clsTienda.getId());
+                            goFinish();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    /* --------------------------------------------------- */
+
+    /**
+     * ╠════════════════════ PERMISSIONS ════════════════════╣
+     **/
+    private void permisoCamera() {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
+                PackageManager.PERMISSION_GRANTED) {
             cameraPhoto();
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_CAMERA_PERMISSIONS);
         }
     }
 
-    /** ╠════════════════════ ACTIVITY RESULT ════════════════════╣ **/
-    private void activityResult(){
+    private void permisoGaleria() {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED) {
+            galeryPhoto();
+        } else {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_GALERY_PERMISSIONS);
+        }
+    }
+
+    /**
+     * ╠════════════════════ ACTIVITY RESULT ════════════════════╣
+     **/
+    private void activityResult() {
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        if(result.getResultCode() == RESULT_OK){
+                        if (result.getResultCode() == RESULT_OK) {
                             Uri photoUri = Uri.fromFile(new File(imageFilePath));
                             String destinationUri = UUID.randomUUID().toString() + EXTENSION_JPG;
                             UCrop.of(photoUri, Uri.fromFile(new File(getCacheDir(), destinationUri)))
                                     .withAspectRatio(1, 1)
-                                    .withMaxResultSize(1000, 1000)
+                                    .withMaxResultSize(RESOLUCION_IMAGE, RESOLUCION_IMAGE)
                                     .start(TiendaActivity.this);
                         }
                     }
@@ -279,28 +481,37 @@ private void onClickEvent(){
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        if(result.getResultCode() == RESULT_OK && result.getData() != null){
+                        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
 
                             Uri photoUri = result.getData().getData();
                             String destinationUri = UUID.randomUUID().toString() + EXTENSION_JPG;
 
                             UCrop.of(photoUri, Uri.fromFile(new File(getCacheDir(), destinationUri)))
                                     .withAspectRatio(1, 1)
-                                    .withMaxResultSize(200, 200)
+                                    .withMaxResultSize(RESOLUCION_IMAGE, RESOLUCION_IMAGE)
                                     .start(TiendaActivity.this);
                         }
                     }
                 });
     }
 
-    /** ╠════════════════════ Override ════════════════════╣ **/
+    /**
+     * ╠════════════════════ Override ════════════════════╣
+     **/
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+        if (requestCode == UCrop.REQUEST_CROP && resultCode == RESULT_OK) {
             imageUriUpload = UCrop.getOutput(data);
             imgTiendaMarca.setImageURI(imageUriUpload);
+        }
 
+        if (requestCode == REQUEST_CODE_CAMERA_PERMISSIONS && resultCode == RESULT_OK) {
+            cameraPhoto();
+        }
+
+        if (requestCode == REQUEST_CODE_GALERY_PERMISSIONS && resultCode == RESULT_OK) {
+            galeryPhoto();
         }
     }
 
@@ -309,7 +520,9 @@ private void onClickEvent(){
         super.onBackPressed();
     }
 
-    /** ╠════════════════════ Methods Camera Take Picture ════════════════════╣ **/
+    /**
+     * ╠════════════════════ Methods Camera Take Picture ════════════════════╣
+     **/
     private File createImageFile() throws IOException {
         String imageFileName = UUID.randomUUID().toString();
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -322,3 +535,9 @@ private void onClickEvent(){
 /*Bundle extras = result.getData().getExtras();
 Bitmap imgBitmap = (Bitmap) extras.get("data");
 imgTiendaMarca.setImageBitmap(imgBitmap);*/
+
+/*Intent data = new Intent();
+String text = "Result to be returned....";
+data.setData(Uri.parse(text));
+setResult(RESULT_OK, data);
+finish();*/

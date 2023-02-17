@@ -1,27 +1,23 @@
 package com.example.dillus.stockapp.UI.Fragment_Session;
 
 import static android.app.Activity.RESULT_OK;
-import static com.example.dillus.stockapp.AppLib.ClsMessage.msgNetworkError;
-import static com.example.dillus.stockapp.AppLib.ClsMessage.msgNoPasswordExits;
-import static com.example.dillus.stockapp.AppLib.ClsMessage.msgNoUserExits;
+import static com.example.dillus.stockapp.AppLib.ClsMessage.msgRequiredEmailFormat;
 import static com.example.dillus.stockapp.AppLib.ClsMessage.msgRequiredFields;
-import static com.example.dillus.stockapp.AppLib.ClsMessageErrorFirebase.msgErrorFirebase_NetworkError;
-import static com.example.dillus.stockapp.AppLib.ClsMessageErrorFirebase.msgErrorFirebase_NoPasswordExits;
-import static com.example.dillus.stockapp.AppLib.ClsMessageErrorFirebase.msgErrorFirebase_NoUserExits;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.COLLECTION_TIENDA;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.COLLECTION_USERS;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.COLLECTION_USER_TIENDA;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_EMAIL;
-import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_ID;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_ID_TIENDA;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_ID_USER;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_NAME;
-import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_PASSWORD;
 import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_PROVIDER;
-import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_TIENDAS;
-import static com.example.dillus.stockapp.AppLib.Clslibrary.PROVIDER_GOOGLE_ACCOUNT;
-import static com.example.dillus.stockapp.AppLib.Clslibrary.REQUEST_CODE_GOOGLE_SIGN_IN;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.MODE_FIRST_TIME;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.MODE_INTENT;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +38,13 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.dillus.stockapp.AppData.ClsCategoria;
+import com.example.dillus.stockapp.AppData.ClsTienda;
+import com.example.dillus.stockapp.AppData.ClsUserTienda;
+import com.example.dillus.stockapp.AppLib.ClsShowMessage;
+import com.example.dillus.stockapp.AppPreferences.PreferTienda;
 import com.example.dillus.stockapp.R;
+import com.example.dillus.stockapp.UI.Activities.TiendaActivity;
 import com.example.dillus.stockapp.UI.MainActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -58,12 +60,10 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +82,8 @@ public class LoginFragment extends Fragment {
     private GoogleSignInClient mGoogleSignInClient;
 
     private Context context;
+
+    private ClsShowMessage clsShowMessage = new ClsShowMessage();
 
     private NavController navController;
 
@@ -149,6 +151,7 @@ public class LoginFragment extends Fragment {
         btnFragmentLoginAccederGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                onLoading(true);
                 onSignInGoogle();
             }
         });
@@ -177,10 +180,15 @@ public class LoginFragment extends Fragment {
         if (etFragmentLoginEmail.getText().toString().trim().isEmpty())
             etFragmentLoginEmail.setError(msgRequiredFields);
 
+        if (!Patterns.EMAIL_ADDRESS.matcher(etFragmentLoginEmail.getText().toString().trim()).matches())
+            etFragmentLoginEmail.setError(msgRequiredEmailFormat);
+
         if (etFragmentLoginPassword.getText().toString().trim().isEmpty())
             etFragmentLoginPassword.setError(msgRequiredFields);
 
-        return !etFragmentLoginEmail.getText().toString().trim().isEmpty() && !etFragmentLoginPassword.getText().toString().trim().isEmpty();
+        return !etFragmentLoginEmail.getText().toString().trim().isEmpty() &&
+                Patterns.EMAIL_ADDRESS.matcher(etFragmentLoginEmail.getText().toString().trim()).matches() &&
+                !etFragmentLoginPassword.getText().toString().trim().isEmpty();
     }
 
     private void goMain() {
@@ -197,136 +205,6 @@ public class LoginFragment extends Fragment {
     private void clearData() {
         etFragmentLoginEmail.setText("");
         etFragmentLoginPassword.setText("");
-    }
-
-    // Iniciar Sesion con usuario existente
-    private void onSignInExistingUser() {
-        mfirebaseAuth.signInWithEmailAndPassword(etFragmentLoginEmail.getText().toString(), etFragmentLoginPassword.getText().toString())
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            // Get current user
-                            FirebaseUser user = mfirebaseAuth.getCurrentUser();
-
-                            // Save data on DB
-
-                            // Go main activity
-                            goMain();
-                        }
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        onLoading(false);
-                        showMessageError(Objects.requireNonNull(e.getMessage()));
-                    }
-                });
-    }
-
-    private void onSignInGoogle() {
-        Intent intent = mGoogleSignInClient.getSignInIntent();
-        googleSignIn_ActivityResult.launch(intent);
-        //startActivityForResult(intent, REQUEST_CODE_GOOGLE_SIGN_IN);
-    }
-
-    private void firebaseAuthWithGoogle(String idToken) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
-        mfirebaseAuth.signInWithCredential(credential)
-                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                    @Override
-                    public void onSuccess(AuthResult authResult) {
-                        if (authResult.getUser() != null) {
-                            Map<String, Object> map = new HashMap<>();
-
-                            Map<String, Object> map_tiendas = new HashMap<>();
-                            List<Map<String, Object>> lista_tiendas = new ArrayList<>();
-
-                            map.put(FIREBASE_ID, authResult.getUser().getUid());
-                            map.put(FIREBASE_NAME, authResult.getUser().getDisplayName());
-                            map.put(FIREBASE_EMAIL, authResult.getUser().getEmail());
-                            map.put(FIREBASE_PROVIDER, PROVIDER_GOOGLE_ACCOUNT);
-                            map.put(FIREBASE_PASSWORD, "");
-                            map.put(FIREBASE_TIENDAS, lista_tiendas);
-                            mfireStore.collection(COLLECTION_USERS).document(authResult.getUser().getUid()).set(map)
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void unused) {
-                                            obtenerTiendas(authResult.getUser().getUid());
-                                            // VERIFICAR TIENDAS
-                                            //goMain();
-                                        }
-                                    })
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-
-                                        }
-                                    }).addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-
-                                        }
-                                    });
-
-                            Toast.makeText(context, authResult.getUser().getDisplayName(), Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                })
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Toast.makeText(context, "Complete!!!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(context, "Failure", Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void obtenerTiendas(String uid) {
-        Map<String, Object> map = new HashMap<>();
-        map.put(FIREBASE_ID, "asdasdasd");
-        mfireStore.collection(COLLECTION_USERS)
-                .document(uid)
-                .collection(FIREBASE_TIENDAS)asdasd
-                .add(map)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(context, "SUCCESS", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
-                        Toast.makeText(context, "DONE", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-    private void showMessageError(String msg) {
-        if (msg.equals(msgErrorFirebase_NoPasswordExits))
-            Toast.makeText(context, msgNoPasswordExits, Toast.LENGTH_SHORT).show();
-
-        else if (msg.equals(msgErrorFirebase_NoUserExits))
-            Toast.makeText(context, msgNoUserExits, Toast.LENGTH_SHORT).show();
-
-        else if (msg.equals(msgErrorFirebase_NetworkError))
-            Toast.makeText(context, msgNetworkError, Toast.LENGTH_SHORT).show();
-
-        else
-            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
     private void onLoading(boolean flag) {
@@ -358,6 +236,187 @@ public class LoginFragment extends Fragment {
         }
     }
 
+    /* --------------------------------------------------- */
+
+    // Iniciar sesion con google account
+    private void onSignInGoogle() {
+        Intent intent = mGoogleSignInClient.getSignInIntent();
+        googleSignIn_ActivityResult.launch(intent);
+        //startActivityForResult(intent, REQUEST_CODE_GOOGLE_SIGN_IN);
+    }
+
+    // Autenticar google account credencial
+    private void firebaseAuthWithGoogle(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        mfirebaseAuth.signInWithCredential(credential)
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult authResult) {
+                        FirebaseUser user = authResult.getUser();
+                        if (user != null) {
+                            existeUsuario(user);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    // Iniciar Sesion con usuario existente
+    private void onSignInExistingUser() {
+        mfirebaseAuth.signInWithEmailAndPassword(etFragmentLoginEmail.getText().toString(), etFragmentLoginPassword.getText().toString())
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult authResult) {
+                        FirebaseUser user = authResult.getUser();
+                        if (user != null) {
+                            obtenerTiendas(user);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    // Verificar si existe el usuario en la base de datos
+    private void existeUsuario(FirebaseUser _user) {
+        mfireStore.collection(COLLECTION_USERS)
+                .whereEqualTo(FIREBASE_ID_USER, _user.getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot lista = task.getResult();
+                            if (lista.size() == 0) { // Nuevo Usuario
+                                addUserDatabase(_user);
+                            } else {
+                                obtenerTiendas(_user);
+                            }
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    // Agregar usuario a firebase database
+    private void addUserDatabase(FirebaseUser _user) {
+        Map<String, Object> map = new HashMap<>();
+
+        map.put(FIREBASE_ID_USER, _user.getUid());
+        map.put(FIREBASE_NAME, _user.getDisplayName());
+        map.put(FIREBASE_EMAIL, _user.getEmail());
+        map.put(FIREBASE_PROVIDER, _user.getProviderId());
+
+        mfireStore.collection(COLLECTION_USERS).document(_user.getUid()).set(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            goCreateTienda();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    // Obtener tienda (s)
+    private void obtenerTiendas(FirebaseUser _user) {
+        mfireStore.collection(COLLECTION_USER_TIENDA)
+                .whereEqualTo(FIREBASE_ID_USER, _user.getUid())
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        List<DocumentSnapshot> lista = queryDocumentSnapshots.getDocuments();
+                        if (lista.size() > 0) {
+                            ClsUserTienda cls = lista.get(0).toObject(ClsUserTienda.class);
+                            assert cls != null;
+                            new PreferTienda().setID_TIENDA(context, cls.getId_tienda());
+
+                            mfireStore.collection(COLLECTION_TIENDA)
+                                    .whereEqualTo(FIREBASE_ID_TIENDA, cls.getId_tienda())
+                                    .get()
+                                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                            List<DocumentSnapshot> listatienda = queryDocumentSnapshots.getDocuments();
+                                            if(listatienda.size() > 0){
+                                                ClsTienda tienda = listatienda.get(0).toObject(ClsTienda.class);
+                                                assert tienda != null;
+                                                new PreferTienda().setNOMBRE_TIENDA(context, tienda.getName());
+                                                new PreferTienda().setURI_TIENDA(context, tienda.getUri());
+
+                                                goMain();
+                                            }
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                                            onLoading(false);
+                                        }
+                                    });
+                        } else {
+                            goCreateTienda();
+                        }
+                    }
+                })
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        /*if (task.isSuccessful()) {
+                            QuerySnapshot lista = task.getResult();
+                            if (lista.size() == 0) { // Nuevo Usuario
+                                goCreateTienda();
+                            } else if(lista.size() > 0){
+                                lista.get
+                                new PreferTienda().setID_TIENDA(context, lista.getDocuments().get(0).get(FIREBASE_ID_TIENDA).toString());
+                                goMain();
+                            }
+                        }*/
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    // Go tienda
+    private void goCreateTienda() {
+        Intent intent = new Intent(context, TiendaActivity.class);
+        intent.putExtra(MODE_INTENT, MODE_FIRST_TIME);
+        startActivity(intent);
+        requireActivity().finish();
+    }
+
     /**
      * ╠════════════════════ ACTIVITY RESULT ════════════════════╣
      **/
@@ -374,32 +433,28 @@ public class LoginFragment extends Fragment {
                                     GoogleSignInAccount account = task.getResult(ApiException.class);
                                     firebaseAuthWithGoogle(account.getIdToken());
                                 } catch (ApiException e) {
-                                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                                    onLoading(false);
                                 }
                             }
+                        } else {
+                            onLoading(false);
                         }
                     }
                 });
     }
-
-    /**
-     * ╠════════════════════ Override ════════════════════╣
-     **/
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_GOOGLE_SIGN_IN && resultCode == RESULT_OK) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            if (task.isSuccessful()) {
-                try {
-                    GoogleSignInAccount account = task.getResult(ApiException.class);
-                    firebaseAuthWithGoogle(account.getIdToken());
-                } catch (ApiException e) {
-                    Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        } else {
-            //LoginActivity.this.finish();
-        }
-    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

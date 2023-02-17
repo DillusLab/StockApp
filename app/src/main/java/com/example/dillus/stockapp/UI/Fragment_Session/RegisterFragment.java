@@ -1,6 +1,14 @@
 package com.example.dillus.stockapp.UI.Fragment_Session;
 
 import static com.example.dillus.stockapp.AppLib.ClsMessage.msgRequiredFields;
+import static com.example.dillus.stockapp.AppLib.ClsMessage.msgSuccess;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.COLLECTION_USERS;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_EMAIL;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_ID_USER;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_NAME;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.FIREBASE_PROVIDER;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.MODE_FIRST_TIME;
+import static com.example.dillus.stockapp.AppLib.Clslibrary.MODE_INTENT;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -22,27 +31,38 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.example.dillus.stockapp.AppLib.ClsShowMessage;
 import com.example.dillus.stockapp.R;
+import com.example.dillus.stockapp.UI.Activities.TiendaActivity;
 import com.example.dillus.stockapp.UI.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class RegisterFragment extends Fragment {
 
     private ImageButton imgButtonFragmentRegisterBack;
+    private ProgressBar progressbarFragmentRegister;
     private ImageView imgFragmentRegisterName, imgFragmentRegisterPassword,
             imgFragmentRegisterEmail, imgFragmentRegisterPasswordVisibility;
     private EditText etFragmentRegisterName, etFragmentRegisterEmail, etFragmentRegisterPassword;
     private Button btnFragmentRegisterRegister;
 
     private FirebaseAuth mfirebaseAuth;
+    private FirebaseFirestore mfireStore;
 
     private Context context;
+    private ClsShowMessage clsShowMessage = new ClsShowMessage();
 
     private NavController navController;
 
@@ -50,10 +70,6 @@ public class RegisterFragment extends Fragment {
 
     public RegisterFragment() {
 
-    }
-
-    public static RegisterFragment newInstance(String param1, String param2) {
-        return new RegisterFragment();
     }
 
     @Override
@@ -65,6 +81,7 @@ public class RegisterFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        assert container != null;
         context = container.getContext();
         return inflater.inflate(R.layout.fragment_register, container, false);
     }
@@ -75,9 +92,11 @@ public class RegisterFragment extends Fragment {
 
         inicializarCampos(view);
         onClickEvent();
+        onLoading(false);
 
         // Initialize Firebase Auth
         mfirebaseAuth = FirebaseAuth.getInstance();
+        mfireStore = FirebaseFirestore.getInstance();
     }
 
     /** ╠════════════════════ Events ════════════════════╣ **/
@@ -112,6 +131,7 @@ public class RegisterFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(onValidarCampos()){
+                    onLoading(true);
                     onSignUpNewUsers(etFragmentRegisterEmail.getText().toString().trim(),
                             etFragmentRegisterPassword.getText().toString().trim(),
                             etFragmentRegisterName.getText().toString().trim());
@@ -120,11 +140,14 @@ public class RegisterFragment extends Fragment {
         });
 
     }
+
     /** ╠════════════════════ Methods ════════════════════╣ **/
     private void inicializarCampos(View view) {
         navController = Navigation.findNavController(view);
 
         imgButtonFragmentRegisterBack = view.findViewById(R.id.imgButtonFragmentRegisterBack);
+
+        progressbarFragmentRegister = view.findViewById(R.id.progressbarFragmentRegister);
 
         imgFragmentRegisterName = view.findViewById(R.id.imgFragmentRegisterName);
         imgFragmentRegisterPassword = view.findViewById(R.id.imgFragmentRegisterPassword);
@@ -146,7 +169,42 @@ public class RegisterFragment extends Fragment {
     private void goMain() {
         Intent intent = new Intent(context, MainActivity.class);
         startActivity(intent);
-        getActivity().finish();
+        requireActivity().finish();
+    }
+
+    private void onLoading(boolean flag) {
+        // TRUE -> Loading
+        if (flag) {
+            imgButtonFragmentRegisterBack.setEnabled(false);
+
+            imgFragmentRegisterName.setImageTintList(ContextCompat.getColorStateList(context, R.color.colorDisable));
+            etFragmentRegisterName.setEnabled(false);
+
+            imgFragmentRegisterEmail.setImageTintList(ContextCompat.getColorStateList(context, R.color.colorDisable));
+            etFragmentRegisterEmail.setEnabled(false);
+
+            imgFragmentRegisterPassword.setImageTintList(ContextCompat.getColorStateList(context, R.color.colorDisable));
+            etFragmentRegisterPassword.setEnabled(false);
+
+            progressbarFragmentRegister.setVisibility(View.VISIBLE);
+
+            btnFragmentRegisterRegister.setEnabled(false);
+        } else {
+            imgButtonFragmentRegisterBack.setEnabled(false);
+
+            imgFragmentRegisterName.setImageTintList(ContextCompat.getColorStateList(context, R.color.colorPrimary));
+            etFragmentRegisterName.setEnabled(true);
+
+            imgFragmentRegisterEmail.setImageTintList(ContextCompat.getColorStateList(context, R.color.colorPrimary));
+            etFragmentRegisterEmail.setEnabled(true);
+
+            imgFragmentRegisterPassword.setImageTintList(ContextCompat.getColorStateList(context, R.color.colorPrimary));
+            etFragmentRegisterPassword.setEnabled(true);
+
+            progressbarFragmentRegister.setVisibility(View.INVISIBLE);
+
+            btnFragmentRegisterRegister.setEnabled(true);
+        }
     }
 
     private void clearData(){
@@ -170,39 +228,86 @@ public class RegisterFragment extends Fragment {
                !etFragmentRegisterPassword.getText().toString().trim().isEmpty();
     }
 
+    /* --------------------------------------------------- */
+
+    // Registrar nuevo usuario
     private void onSignUpNewUsers(String _email, String _password, String _name){
         mfirebaseAuth.createUserWithEmailAndPassword(_email, _password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        // Get current user
-                        FirebaseUser user = mfirebaseAuth.getCurrentUser();
-                        // Update user name
-                        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest
-                                .Builder().setDisplayName(_name).build();
-
-                        assert user != null;
-                        user.updateProfile(profileUpdates)
-                                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            goMain();
-                                        }
-                                    }
-                                })
-                                .addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                    public void onSuccess(AuthResult authResult) {
+                        FirebaseUser user = authResult.getUser();
+                        if(user != null){
+                            actualizarDatos(user, _name);
+                        }
                     }
-                }).addOnFailureListener(new OnFailureListener() {
+                })
+                .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(context, e.toString(), Toast.LENGTH_SHORT).show();
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
                     }
                 });
+    }
+
+    // Actualizar Datos del Usuario
+    private void actualizarDatos(FirebaseUser _user, String _name){
+
+        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest
+                .Builder().setDisplayName(_name).build();
+
+        _user.updateProfile(profileUpdates)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            // Guardar en firebase
+                            addUserDatabase(_user);
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    // Agregar usuario a firebase database
+    private void addUserDatabase(FirebaseUser _user){
+        Map<String, Object> map = new HashMap<>();
+
+        map.put(FIREBASE_ID_USER, _user.getUid());
+        map.put(FIREBASE_NAME, _user.getDisplayName());
+        map.put(FIREBASE_EMAIL, _user.getEmail());
+        map.put(FIREBASE_PROVIDER, _user.getProviderId());
+
+        mfireStore.collection(COLLECTION_USERS).document(_user.getUid()).set(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            goCreateTienda();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        clsShowMessage.showMessageError(context, Objects.requireNonNull(e.getMessage()));
+                        onLoading(false);
+                    }
+                });
+    }
+
+    // Go tienda
+    private void goCreateTienda(){
+        Intent intent = new Intent(context, TiendaActivity.class);
+        intent.putExtra(MODE_INTENT, MODE_FIRST_TIME);
+        startActivity(intent);
+        requireActivity().finish();
     }
 }

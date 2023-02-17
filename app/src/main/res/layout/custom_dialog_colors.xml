@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="32dp"
+    android:paddingBottom="32dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutProductoCodigoContainer">
+
+        <LinearLayout
+            android:id="@+id/linearLayoutProductoNombre"
+            style="@style/styleEditTextLinearLayout"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:baselineAligned="false">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <CheckBox
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:id="@+id/checkboxDialogColorBlack"
+                        android:buttonTint="@color/colorPrimary"/>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/imgDialogColorBlack"
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:layout_marginStart="8dp"
+                        android:background="@color/colorBlack"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <CheckBox
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:id="@+id/checkboxDialogColorWhite"
+                        android:buttonTint="@color/colorPrimary"/>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/imgDialogColorWhite"
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:layout_marginStart="8dp"
+
+                        android:background="@color/colorWhite"
+                        app:riv_border_color="@color/colorDisable"
+                        app:riv_border_width="1dp"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <CheckBox
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:id="@+id/checkboxDialogColorRed"
+                        android:buttonTint="@color/colorPrimary"/>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/imgDialogColorRed"
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:layout_marginStart="8dp"
+                        android:background="@color/colorRed"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <CheckBox
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:id="@+id/checkboxDialogColorBlue"
+                        android:buttonTint="@color/colorPrimary"/>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/imgDialogColorBlue"
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:layout_marginStart="8dp"
+                        android:background="@color/colorBlue"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <CheckBox
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:id="@+id/checkboxDialogColorGreen"
+                        android:buttonTint="@color/colorPrimary"/>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/imgDialogColorGreen"
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:layout_marginStart="8dp"
+                        android:background="@color/colorGreen"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <CheckBox
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:id="@+id/checkboxDialogColorYellow"
+                        android:buttonTint="@color/colorPrimary"/>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/imgDialogColorYellow"
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:layout_marginStart="8dp"
+                        android:background="@color/colorYellow"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <CheckBox
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:id="@+id/checkboxDialogColorOrange"
+                        android:buttonTint="@color/colorPrimary"/>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/imgDialogColorOrange"
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:layout_marginStart="8dp"
+                        android:background="@color/colorOrange"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <CheckBox
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:id="@+id/checkboxDialogColorGray"
+                        android:buttonTint="@color/colorPrimary"/>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/imgDialogColorGray"
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:layout_marginStart="8dp"
+                        android:background="@color/colorGray"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
+
+                    <CheckBox
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:id="@+id/checkboxDialogColorPurple"
+                        android:buttonTint="@color/colorPrimary"/>
+
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/imgDialogColorPurple"
+                        android:layout_width="@dimen/iconSize"
+                        android:layout_height="@dimen/iconSize"
+                        android:layout_marginStart="8dp"
+                        android:background="@color/colorPurple"
+                        app:riv_mutate_background="true"
+                        app:riv_oval="true" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvDialog"
+            style="@style/styleEditTextTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:background="@color/colorWhite"
+            android:padding="4dp"
+            android:text="@string/colores"
+            android:textAllCaps="true"
+            android:textColor="@color/colorPrimaryDark"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayoutProductoNombre"
+            app:layout_constraintStart_toStartOf="@+id/linearLayoutProductoNombre"
+            app:layout_constraintTop_toTopOf="@+id/linearLayoutProductoNombre" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnDialogColorCancel"
+            style="@style/styleButtonEssential"
+            android:layout_weight="1"
+            android:backgroundTint="@color/colorDisable"
+            android:text="@string/cancelar"
+            android:textColor="@color/colorPrimary" />
+
+        <Button
+            android:id="@+id/btnDialogColorAccept"
+            style="@style/styleButtonEssential"
+            android:layout_weight="1"
+            android:text="@string/aceptar" />
+
+    </LinearLayout>
+
+</LinearLayout>
